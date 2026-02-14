@@ -1,98 +1,78 @@
 import streamlit as st
 
-st.title("🌍 Safari Tour Recommender")
+st.set_page_config(page_title="Elite Safari Planner", page_icon="🦒", layout="wide")
 
-# Set Page Config for a professional look
-st.set_page_config(page_title="Safari Mood Finder", page_icon="🦒", layout="wide")
-
-# --- 1. The Knowledge Base ---
-# List of dictionaries to store the complex safari facts
+# 1. Knowledge Base: Safari Tours
 safari_data = [
-    {
-        "name": "The Great Migration Thrill",
-        "location": "Masai Mara, Kenya",
-        "mood": "Adventurous",
-        "weather": "Sunny & Dusty",
-        "animals": ["Lions", "Wildebeest", "Cheetahs", "Crocodiles"],
-        "max_pax": 6,
-        "vehicle": "Open-top 4x4 Land Cruiser",
-        "best_time": "July to October"
-    },
-    {
-        "name": "Kilimanjaro Sunset Zen",
-        "location": "Amboseli, Kenya",
-        "mood": "Relaxed",
-        "weather": "Dry & Hot",
-        "animals": ["Elephants", "Flamingos", "Hippos"],
-        "max_pax": 4,
-        "vehicle": "Luxury Safari Van with Pop-up Roof",
-        "best_time": "January to March"
-    },
-    {
-        "name": "Northern Frontier Conservation",
-        "location": "Samburu/Lewa, Kenya",
-        "mood": "Educational",
-        "weather": "Breezy & Arid",
-        "animals": ["Black Rhino", "Grevy's Zebra", "Reticulated Giraffe"],
-        "max_pax": 2,
-        "vehicle": "Electric Silent Safari Jeep",
-        "best_time": "Year-round"
-    },
-    {
-        "name": "Coastal Bush & Beach Mix",
-        "location": "Lamu/Tsavo, Kenya",
-        "mood": "Romantic",
-        "weather": "Humid & Tropical",
-        "animals": ["Red Elephants", "Lions", "Dolphins"],
-        "max_pax": 2,
-        "vehicle": "Convertible Safari Jeep & Dhow Boat",
-        "best_time": "November to February"
-    }
+    {"name": "Masai Mara", "location": "Kenya", "mood": "Adventurous", "weather": "Sunny & Dusty", "animals": ["Lions", "Wildebeest", "Cheetahs"], "best_time": "July - Oct"},
+    {"name": "Serengeti", "location": "Tanzania", "mood": "Adventurous", "weather": "Hot & Vast", "animals": ["Lions", "Leopards", "Hyenas"], "best_time": "June - Sept"},
+    {"name": "Amboseli", "location": "Kenya", "mood": "Relaxed", "weather": "Dry & Hot", "animals": ["Elephants", "Flamingos"], "best_time": "Jan - March"},
+    {"name": "Bwindi Forest", "location": "Uganda", "mood": "Educational", "animals": ["Mountain Gorillas"], "best_time": "June - Aug"},
+    {"name": "Ngorongoro Crater", "location": "Tanzania", "mood": "Romantic", "weather": "Mild & Misty", "animals": ["Black Rhinos", "Lions"], "best_time": "Year-round"},
+    {"name": "Volcanoes Park", "location": "Rwanda", "mood": "Conservation", "weather": "Cool & Misty", "animals": ["Gorillas", "Golden Monkeys"], "best_time": "Dec - Feb"},
+    {"name": "Samburu", "location": "Kenya", "mood": "Adventurous", "weather": "Arid & Hot", "animals": ["Gerenuk", "Grevy's Zebra"], "best_time": "June - Sept"},
+    {"name": "Laikipia", "location": "Kenya", "mood": "Educational", "animals": ["Wild Dogs", "Rhinos"], "best_time": "Year-round"},
+    {"name": "Tsavo East", "location": "Kenya", "mood": "Relaxed", "weather": "Hot", "animals": ["Red Elephants", "Lions"], "best_time": "Dec - March"},
+    {"name": "Lake Manyara", "location": "Tanzania", "mood": "Relaxed", "weather": "Tropical", "animals": ["Tree-climbing Lions"], "best_time": "June - Oct"},
+    {"name": "Queen Elizabeth", "location": "Uganda", "mood": "Adventurous", "weather": "Humid", "animals": ["Hippos", "Leopards"], "best_time": "Jan - Feb"},
+    {"name": "Tarangire", "location": "Tanzania", "mood": "Relaxed", "weather": "Dry", "animals": ["Large Elephant Herds"], "best_time": "June - Oct"},
+    {"name": "Ol Pejeta", "location": "Kenya", "mood": "Conservation", "animals": ["White Rhinos", "Chimpanzees"], "best_time": "Year-round"},
+    {"name": "Murchison Falls", "location": "Uganda", "mood": "Adventurous", "weather": "Tropical", "animals": ["Crocodiles", "Giraffes"], "best_time": "Dec - Feb"},
+    {"name": "Akagera", "location": "Rwanda", "mood": "Adventurous", "weather": "Warm", "animals": ["Zebras", "Antelopes"], "best_time": "June - Sept"},
+    {"name": "Hell's Gate", "location": "Kenya", "mood": "Adventurous", "weather": "Sunny", "animals": ["Warthogs", "Buffalos"], "best_time": "Year-round"},
+    {"name": "Zanzibar Reefs", "location": "Tanzania", "mood": "Romantic", "weather": "Tropical", "animals": ["Dolphins", "Sea Turtles"], "best_time": "Nov - Feb"},
+    {"name": "Solio Reserve", "location": "Kenya", "mood": "Conservation", "animals": ["Rhinos"], "best_time": "Year-round"},
+    {"name": "Lake Nakuru", "location": "Kenya", "mood": "Educational", "animals": ["Flamingos", "White Rhinos"], "best_time": "Year-round"},
+    {"name": "Kidepo Valley", "location": "Uganda", "mood": "Adventurous", "weather": "Hot/Dry", "animals": ["Cheetahs", "Ostriches"], "best_time": "Sept - March"}
 ]
 
-# --- 2. USER INTERFACE (The Frontend) ---
-st.title("🌍 Safari Tour Recommender")
+# 2. UI
+st.title("🌍 Elite Safari Tour Recommender")
 st.markdown("---")
 
-# Using columns to organize inputs
 col1, col2 = st.columns(2)
 
 with col1:
     user_mood = st.selectbox(
-        "How are you feeling today? (Mood)", 
-        ["Adventurous", "Relaxed", "Educational", "Romantic"]
+        "What is your trip vibe? (Mood)", 
+        ["Adventurous", "Relaxed", "Educational", "Romantic", "Conservation"]
     )
 
 with col2:
-    user_pax = st.number_input("How many travelers (PAX)?", min_value=1, max_value=10, value=2)
+    user_pax = st.number_input("How many travelers (PAX)?", min_value=1, max_value=25, value=2)
 
 st.markdown("---")
 
-# --- 3. FILTERING LOGIC (The Backend) ---
-# We search the data for a mood match AND ensure the car can fit the group
-matches = [
-    tour for tour in safari_data 
-    if tour["mood"] == user_mood and tour["max_pax"] >= user_pax
-]
+#3. Vehicle Logic
+if user_pax <= 6:
+    vehicle_type = "1x Custom 4x4 Land Cruiser"
+    vehicle_note = "A single vehicle for an intimate, private experience."
+elif user_pax <= 12:
+    vehicle_type = "2x Custom 4x4 Land Cruisers"
+    vehicle_note = "Your group will travel in two linked vehicles with radio communication."
+else:
+    vehicle_type = "Custom Overland Safari Truck"
+    vehicle_note = "Equipped with an onboard kitchen and crew for large group comfort."
 
-# --- 4. DISPLAYING RESULTS ---
+
+
+#4. Filtering & Displaying Results
+matches = [tour for tour in safari_data if tour["mood"] == user_mood]
+
 if matches:
-    st.subheader(f"✨ We found {len(matches)} matches for your {user_mood} trip:")
+    st.subheader(f"✨ Found {len(matches)} matches for a {user_mood} trip:")
+    st.info(f"🚙 **Vehicle Assignment:** {vehicle_type}\n\n*{vehicle_note}*")
     
     for tour in matches:
-        with st.container():
-            # Create a nice "card" for each safari
-            st.write(f"### {tour['name']}")
-            c1, c2, c3 = st.columns(3)
+        # Expanders to keep the list tidy
+        with st.expander(f"📍 {tour['name']} ({tour['location']})"):
+            c1, c2 = st.columns(2)
             with c1:
-                st.info(f"📍 **Location:**\n{tour['location']}")
-                st.info(f"🚙 **Vehicle:**\n{tour['vehicle']}")
+                st.write(f"🐾 **Animals to see:** {', '.join(tour['animals'])}")
+                if "weather" in tour: st.write(f"☀️ **Weather:** {tour['weather']}")
             with c2:
-                st.success(f"🐾 **Animals:**\n{', '.join(tour['animals'])}")
-                st.success(f"☀️ **Weather:**\n{tour['weather']}")
-            with c3:
-                st.warning(f"👥 **Max Capacity:**\n{tour['max_pax']} PAX")
-                st.warning(f"📅 **Best Time:**\n{tour['best_time']}")
-            st.markdown("---")
+                st.write(f"📅 **Best Time to Visit:** {tour['best_time']}")
+                if st.button(f"Request Quote for {tour['name']}", key=tour['name']):
+                    st.success(f"Inquiry for {user_pax} PAX sent to the booking team!")
 else:
-    st.error("No tours match your specific PAX and Mood combination. Try a smaller group or a different mood!")
+    st.error("No tours match your criteria. Try a different mood!")
