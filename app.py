@@ -76,3 +76,45 @@ if matches:
                     st.success(f"Inquiry for {user_pax} PAX sent to the booking team!")
 else:
     st.error("No tours match your criteria. Try a different mood!")
+    
+    
+
+from streamlit_gsheets import GSheetsConnection
+import pandas as pd
+
+# 1. Establish the connection
+conn = st.connection("gsheets", type=GSheetsConnection)
+
+# 2. Wrap the booking in a Form
+with st.form("booking_form"):
+    st.write("### 📝 Request Your Custom Quote")
+    full_name = st.text_input("Full Name")
+    email = st.text_input("Email Address")
+    special_notes = st.text_area("Any special requests?")
+    
+    submit_button = st.form_submit_button("Submit Request")
+
+    if submit_button:
+        if not full_name or not email:
+            st.error("Please fill in your name and email!")
+        else:
+            # Create a dataframe with the new lead
+            new_data = pd.DataFrame([{
+                "Name": full_name,
+                "Email": email,
+                "Mood": user_mood,
+                "PAX": user_pax,
+                "Destination": "Selected Destination", # You can pass the actual tour name here
+                "Vehicle": vehicle_type,
+                "Notes": special_notes
+            }])
+            
+            # Read existing data and append the new lead
+            existing_data = conn.read(worksheet="Sheet1")
+            updated_df = pd.concat([existing_data, new_data], ignore_index=True)
+            
+            # Update Google Sheet
+            conn.update(worksheet="Sheet1", data=updated_df)
+            
+            st.balloons()
+            st.success("Success! Your safari request has been logged in our system.")
