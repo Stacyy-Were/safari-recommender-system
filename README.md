@@ -1,53 +1,45 @@
-🦒 Elite Safari Tour Recommender
+# 🦒 Elite Safari Tour Recommender
+
 A professional Streamlit web application designed for East African safari agencies to provide curated travel recommendations and capture high-quality leads.
 
-🚀 Features
-Dynamic Matching: Recommends 20+ specific destinations across Kenya, Tanzania, Uganda, and Rwanda based on user "vibes" (Adventurous, Romantic, etc.).
+## 🚀 Features
+* **Dynamic Matching:** Recommends 20+ specific destinations across Kenya, Tanzania, Uganda, and Rwanda based on user "vibes" (Adventurous, Romantic, etc.).
+* **Smart Fleet Assignment:** Automatically calculates the required vehicle fleet (Land Cruisers vs. Overland Trucks) based on the number of travelers (PAX).
+* **Lead Capture System:** Integrated inquiry form for users to request custom quotes directly.
+* **Professional UI:** Built with a "Wide" layout, interactive expanders for wildlife details, and real-time feedback.
 
-Smart Fleet Assignment: Automatically calculates the required vehicle fleet (Land Cruisers vs. Overland Trucks) based on the number of travelers (PAX).
+## 🛠️ Tech Stack
+* **Language:** Python 3.9+
+* **Framework:** [Streamlit](https://streamlit.io/)
+* **Data Handling:** Pandas
+* **Communication:** Requests API (Integrated with FormSubmit)
 
-Lead Capture System: Integrated inquiry form for users to request custom quotes directly.
+## 📦 Installation & Local Setup
 
-Professional UI: Built with a "Wide" layout, interactive expanders for wildlife details, and real-time feedback.
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YOUR_USERNAME/safari-recommender-system.git](https://github.com/YOUR_USERNAME/safari-recommender-system.git)
+   cd safari-recommender-system
 
-🛠️ Tech Stack
-Language: Python 3.x
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
 
-Framework: Streamlit
+3. **Run the application:**
+   ```bash
+   streamlit run app.py
 
-Data Handling: Pandas
+## 📝 How the system works
+The app uses a POST request to FormSubmit to send user inquiries directly to the agency's email.
 
-Communication: Requests API (Integrated with FormSubmit/EmailJS)
+Note: The first time a lead is sent, the receiver must check their email to activate the form endpoint (But for no wit very complicated, still trying to get around it)
 
-📦 Installation & Local Setup
-Clone the repository:
+## 🦒 Destinations Covered
 
-Bash
-git clone https://github.com/YOUR_USERNAME/safari-recommender-system.git
-cd safari-recommender-system
-Install dependencies:
+1. Kenya: Masai Mara, Amboseli, Samburu, Ol Pejeta.
 
-Bash
-pip install -r requirements.txt
-Run the application:
+2. Tanzania: Serengeti, Ngorongoro Crater, Tarangire.
 
-Bash
-streamlit run app.py
-📂 Project Structure
-Plaintext
-├── app.py              # Main application logic and UI
-├── requirements.txt    # Required Python libraries
-└── README.md           # Project documentation
-📝 Configuration
-To enable the email inquiry feature, ensure the MY_EMAIL variable in app.py is updated to your professional contact address. For production deployment on Streamlit Cloud, remember to verify your sender address via the chosen email API service.
+3. Uganda: Bwindi Impenetrable Forest, Murchison Falls.
 
-🦒 Destinations Covered
-Includes iconic locations such as:
-
-Kenya: Masai Mara, Amboseli, Samburu, Ol Pejeta.
-
-Tanzania: Serengeti, Ngorongoro Crater, Tarangire.
-
-Uganda: Bwindi Impenetrable Forest, Murchison Falls.
-
-Rwanda: Volcanoes National Park, Akagera.
+4. Rwanda: Volcanoes National Park, Akagera.
