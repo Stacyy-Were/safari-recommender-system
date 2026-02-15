@@ -87,12 +87,14 @@ if matches:
         selected_safari = st.selectbox("Destination of interest", [t['name'] for t in matches])
         notes = st.text_area("Any special requests (Dietary, Honeymoon, etc.)?")
         
-        # Email Configuration > .streamlit/secrets.toml
-        MY_CONTACT_EMAIL = st.secrets["my_email"]
+        # Direct email
+        MY_CONTACT_EMAIL = "stacywere1234@gmail.com" 
         
-        if st.form_submit_button("Send Inquiry"):
+        submit_button = st.form_submit_button("Send Inquiry")
+        
+        if submit_button:
             if full_name and email_address:
-                # Prepare the email body
+                # Direct Email body
                 email_body = f"""
                 NEW SAFARI LEAD:
                 -----------------
@@ -105,7 +107,7 @@ if matches:
                 Notes: {notes}
                 """
                 
-                # Send to FormSubmit via POST request
+                # Send to FormSubmit using POST request
                 try:
                     response = requests.post(
                         f"https://formsubmit.co/ajax/{MY_CONTACT_EMAIL}",
