@@ -32,7 +32,7 @@ A professional Streamlit web application designed for East African safari agenci
 ## 📝 How the system works
 The app uses a POST request to FormSubmit to send user inquiries directly to the agency's email.
 
-Note: The first time a lead is sent, the receiver must check their email to activate the form endpoint (But for no wit very complicated, still trying to get around it)
+Note: The first time a lead is sent, the receiver must check their email to activate the form endpoint (But for now, I get very complicated and confusing server responses, still trying to get around it)
 
 ## 🦒 Destinations Covered
 
