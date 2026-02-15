@@ -112,7 +112,9 @@ if matches:
                     )
                     if response.status_code == 200:
                         st.balloons()
-                        st.success("Dankie! Inquiry sent. If this is your first time, check your email to activate the form!")
+                        st.success("Dankie! Inquiry sent.")
+                        # Server response
+                        st.write(f"Server Response: {response.json()}")
                     else:
                         st.error("Submission failed. Please try again.")
                 except Exception as e:
