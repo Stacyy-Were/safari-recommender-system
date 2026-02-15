@@ -1,22 +1,22 @@
 import streamlit as st
-from streamlit_gsheets import GSheetsConnection
+import requests  # We need this to send the email data
 import pandas as pd
 
 # 1. PAGE CONFIGURATION
 st.set_page_config(page_title="Elite Safari Planner", page_icon="🦒", layout="wide")
 
-# 2. HEADER AND DESCRIPTION
+# 2. AGENCY DESCRIPTION & HEADER
 st.title("🌍 Elite Safari Tour Recommender")
 st.markdown("""
 ### Welcome to your next Great Adventure. 
 We specialize in curated East African experiences. Our expert system matches your personal travel style 
-with the most iconic landscapes in the world. Whether you seek the adrenaline of the **Great Migration** or the serenity of a **Private Conservancy**, we ensure the logistics—from PAX capacity to vehicle 
-selection—are handled perfectly.
+with the most iconic landscapes in the world. Once you find your vibe, request a quote and our team will 
+reach out to you directly via email.
 """)
-st.info("💡 **How it works:** Select your preferred vibe and group size. Our engine will automatically assign the appropriate vehicle fleet and show you the best matching destinations.")
+st.info("💡 **How it works:** Select your vibe and group size. We will assign the fleet and show you destinations. Request a quote to receive a custom itinerary.")
 st.markdown("---")
 
-# 3. THE KNOWLEDGE BASE (20 Destinations)
+# 3. THE KNOWLEDGE BASE
 safari_data = [
     {"name": "Masai Mara", "location": "Kenya", "mood": "Adventurous", "weather": "Sunny & Dusty", "animals": "Lions, Wildebeest, Cheetahs", "best_time": "July - Oct"},
     {"name": "Serengeti", "location": "Tanzania", "mood": "Adventurous", "weather": "Hot & Vast", "animals": "Lions, Leopards, Hyenas", "best_time": "June - Sept"},
@@ -40,13 +40,7 @@ safari_data = [
     {"name": "Kidepo Valley", "location": "Uganda", "mood": "Adventurous", "weather": "Hot & Dry", "animals": "Cheetahs, Ostriches", "best_time": "Sept - March"}
 ]
 
-# 4. GOOGLE SHEETS CONNECTION
-try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-except Exception as e:
-    st.error("Google Sheets connection not configured. Check your Streamlit Secrets.")
-
-# 5. USER INPUTS
+# 4. USER INPUTS
 col1, col2 = st.columns([1, 1])
 
 with col1:
@@ -59,69 +53,76 @@ with col1:
 with col2:
     user_pax = st.number_input("How many travelers (PAX)?", min_value=1, max_value=25, value=2)
 
-# 6. DYNAMIC VEHICLE LOGIC
+# 5. DYNAMIC VEHICLE LOGIC
 if user_pax <= 6:
     vehicle_type = "1x Custom 4x4 Land Cruiser"
-    vehicle_desc = "Intimate and private."
 elif user_pax <= 12:
     vehicle_type = "2x Custom 4x4 Land Cruisers"
-    vehicle_desc = "Two vehicles linked by radio."
 else:
     vehicle_type = "Custom Overland Safari Truck"
-    vehicle_desc = "Spacious with onboard facilities."
 
-# 7. FILTERING & RESULTS
+# 6. FILTERING & RESULTS
 matches = [tour for tour in safari_data if tour["mood"] == user_mood]
 
 if matches:
     st.markdown(f"### Recommended for a {user_mood} Experience")
-    st.success(f"🚙 **Vehicle Fleet Assigned:** {vehicle_type} ({vehicle_desc})")
+    st.success(f"🚙 **Vehicle Assigned:** {vehicle_type}")
     
     for tour in matches:
         with st.expander(f"📍 {tour['name']} — {tour['location']}"):
             c1, c2 = st.columns(2)
             with c1:
-                st.write(f"🐾 **Wildlife Highlights:** {tour.get('animals', 'Various Species')}")
-                st.write(f"☀️ **Expected Weather:** {tour.get('weather', 'Variable')}")
+                st.write(f"🐾 **Wildlife:** {tour.get('animals', 'Various')}")
+                st.write(f"☀️ **Weather:** {tour.get('weather', 'Variable')}")
             with c2:
-                st.write(f"📅 **Best Time to Visit:** {tour.get('best_time', 'Year-round')}")
+                st.write(f"📅 **Best Time:** {tour.get('best_time', 'Year-round')}")
 
     st.markdown("---")
     
-    # 8. BOOKING FORM
-    with st.form("booking_form"):
-        st.subheader("📝 Request a Customized Quote")
+    # 7. EMAIL BOOKING FORM
+    with st.form("email_form"):
+        st.subheader("📬 Request a Custom Quote")
         full_name = st.text_input("Full Name")
-        email = st.text_input("Email Address")
-        selected_safari = st.selectbox("Preferred Destination", [t['name'] for t in matches])
-        notes = st.text_area("Any special requests or dietary requirements?")
+        email_address = st.text_input("Your Email Address")
+        selected_safari = st.selectbox("Destination of interest", [t['name'] for t in matches])
+        notes = st.text_area("Any special requests (Dietary, Honeymoon, etc.)?")
         
-        if st.form_submit_button("Send to Planning Team"):
-            if full_name and email:
+        # Email Configuration > .streamlit/secrets.toml
+        MY_CONTACT_EMAIL = st.secrets["my_email"]
+        
+        if st.form_submit_button("Send Inquiry"):
+            if full_name and email_address:
+                # Prepare the email body
+                email_body = f"""
+                NEW SAFARI LEAD:
+                -----------------
+                Name: {full_name}
+                Email: {email_address}
+                Vibe: {user_mood}
+                PAX: {user_pax}
+                Destination: {selected_safari}
+                Vehicle: {vehicle_type}
+                Notes: {notes}
+                """
+                
+                # Send to FormSubmit via POST request
                 try:
-                    # Create the lead row
-                    new_lead = pd.DataFrame([{
-                        "Name": full_name,
-                        "Email": email,
-                        "Mood": user_mood,
-                        "PAX": user_pax,
-                        "Destination": selected_safari,
-                        "Vehicle": vehicle_type,
-                        "Notes": notes
-                    }])
-                    
-                    # Read current sheet with ttl=0 to avoid cache issues
-                    existing_data = conn.read(ttl=0)
-                    
-                    # Combine and Update
-                    updated_df = pd.concat([existing_data, new_lead], ignore_index=True)
-                    conn.update(data=updated_df)
-                    
-                    st.balloons()
-                    st.success("Your request has been sent! Stacy and the team will be in touch.")
+                    response = requests.post(
+                        f"https://formsubmit.co/ajax/{MY_CONTACT_EMAIL}",
+                        data={
+                            "_subject": f"🦁 New Inquiry from {full_name}",
+                            "message": email_body,
+                            "_replyto": email_address
+                        }
+                    )
+                    if response.status_code == 200:
+                        st.balloons()
+                        st.success("Dankie! We've received your request and will email you back soon.")
+                    else:
+                        st.error("Submission failed. Please check your internet or try again.")
                 except Exception as e:
-                    st.error(f"Error submitting to Google Sheets: {e}")
+                    st.error(f"Error: {e}")
             else:
-                st.warning("Please provide your name and email address.")
+                st.warning("Please fill in your name and email address.")
 else:
-    st.error("No matches found for this specific mood. Please select a different vibe.")
+    st.error("No matches found for this mood.")
