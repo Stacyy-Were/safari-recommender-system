@@ -1,5 +1,5 @@
 import streamlit as st
-import requests  # We need this to send the email data
+import requests
 import pandas as pd
 
 # 1. PAGE CONFIGURATION
@@ -10,13 +10,12 @@ st.title("🌍 Elite Safari Tour Recommender")
 st.markdown("""
 ### Welcome to your next Great Adventure. 
 We specialize in curated East African experiences. Our expert system matches your personal travel style 
-with the most iconic landscapes in the world. Once you find your vibe, request a quote and our team will 
-reach out to you directly via email.
+with the most iconic landscapes in the world.
 """)
-st.info("💡 **How it works:** Select your vibe and group size. We will assign the fleet and show you destinations. Request a quote to receive a custom itinerary.")
+st.info("💡 **How it works:** Select your vibe and group size. We will assign the fleet and show you destinations.")
 st.markdown("---")
 
-# 3. THE KNOWLEDGE BASE
+# 3. THE KNOWLEDGE BASE (20 Destinations)
 safari_data = [
     {"name": "Masai Mara", "location": "Kenya", "mood": "Adventurous", "weather": "Sunny & Dusty", "animals": "Lions, Wildebeest, Cheetahs", "best_time": "July - Oct"},
     {"name": "Serengeti", "location": "Tanzania", "mood": "Adventurous", "weather": "Hot & Vast", "animals": "Lions, Leopards, Hyenas", "best_time": "June - Sept"},
@@ -42,14 +41,8 @@ safari_data = [
 
 # 4. USER INPUTS
 col1, col2 = st.columns([1, 1])
-
 with col1:
-    user_mood = st.radio(
-        "What is your trip vibe?", 
-        ["Adventurous", "Relaxed", "Educational", "Romantic", "Conservation"],
-        horizontal=True
-    )
-
+    user_mood = st.radio("What is your trip vibe?", ["Adventurous", "Relaxed", "Educational", "Romantic", "Conservation"], horizontal=True)
 with col2:
     user_pax = st.number_input("How many travelers (PAX)?", min_value=1, max_value=25, value=2)
 
@@ -83,23 +76,23 @@ if matches:
     with st.form("email_form"):
         st.subheader("📬 Request a Custom Quote")
         full_name = st.text_input("Full Name")
-        email_address = st.text_input("Your Email Address")
+        user_email = st.text_input("Your Email Address")
         selected_safari = st.selectbox("Destination of interest", [t['name'] for t in matches])
-        notes = st.text_area("Any special requests (Dietary, Honeymoon, etc.)?")
+        notes = st.text_area("Any special requests?")
         
-        # Direct email
-        MY_CONTACT_EMAIL = "stacywere1234@gmail.com" 
+        # Hardcoded receiver email
+        MY_EMAIL = "stacywere1234@gmail.com" 
         
         submit_button = st.form_submit_button("Send Inquiry")
         
         if submit_button:
-            if full_name and email_address:
-                # Direct Email body
+            if full_name and user_email:
+                # Prepare the email body
                 email_body = f"""
                 NEW SAFARI LEAD:
                 -----------------
                 Name: {full_name}
-                Email: {email_address}
+                Email: {user_email}
                 Vibe: {user_mood}
                 PAX: {user_pax}
                 Destination: {selected_safari}
@@ -107,23 +100,23 @@ if matches:
                 Notes: {notes}
                 """
                 
-                # Send to FormSubmit using POST request
+                # Send to FormSubmit via POST request
                 try:
                     response = requests.post(
-                        f"https://formsubmit.co/ajax/{MY_CONTACT_EMAIL}",
+                        f"https://formsubmit.co/ajax/{MY_EMAIL}",
                         data={
-                            "_subject": f"🦁 New Inquiry from {full_name}",
+                            "_subject": f"🦁 New Safari Inquiry: {full_name}",
                             "message": email_body,
-                            "_replyto": email_address
+                            "_replyto": user_email
                         }
                     )
                     if response.status_code == 200:
                         st.balloons()
-                        st.success("Dankie! We've received your request and will email you back soon.")
+                        st.success("Dankie! Inquiry sent. If this is your first time, check your email to activate the form!")
                     else:
-                        st.error("Submission failed. Please check your internet or try again.")
+                        st.error("Submission failed. Please try again.")
                 except Exception as e:
-                    st.error(f"Error: {e}")
+                    st.error(f"Connection Error: {e}")
             else:
                 st.warning("Please fill in your name and email address.")
 else:
