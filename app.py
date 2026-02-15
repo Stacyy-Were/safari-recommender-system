@@ -5,6 +5,7 @@ import pandas as pd
 # 1. PAGE CONFIGURATION
 st.set_page_config(page_title="Elite Safari Planner", page_icon="🦒", layout="wide")
 
+# 2. HEADER AND DESCRIPTION
 st.title("🌍 Elite Safari Tour Recommender")
 st.markdown("""
 ### Welcome to your next Great Adventure. 
@@ -15,7 +16,7 @@ selection—are handled perfectly.
 st.info("💡 **How it works:** Select your preferred vibe and group size. Our engine will automatically assign the appropriate vehicle fleet and show you the best matching destinations.")
 st.markdown("---")
 
-# 3. THE KNOWLEDGE BASE
+# 3. THE KNOWLEDGE BASE (20 Destinations)
 safari_data = [
     {"name": "Masai Mara", "location": "Kenya", "mood": "Adventurous", "weather": "Sunny & Dusty", "animals": "Lions, Wildebeest, Cheetahs", "best_time": "July - Oct"},
     {"name": "Serengeti", "location": "Tanzania", "mood": "Adventurous", "weather": "Hot & Vast", "animals": "Lions, Leopards, Hyenas", "best_time": "June - Sept"},
@@ -76,7 +77,6 @@ if matches:
     st.markdown(f"### Recommended for a {user_mood} Experience")
     st.success(f"🚙 **Vehicle Fleet Assigned:** {vehicle_type} ({vehicle_desc})")
     
-    # Grid display by expanders
     for tour in matches:
         with st.expander(f"📍 {tour['name']} — {tour['location']}"):
             c1, c2 = st.columns(2)
@@ -88,7 +88,7 @@ if matches:
 
     st.markdown("---")
     
-    # 8. BOOKING FORM (> Google Sheets)
+    # 8. BOOKING FORM
     with st.form("booking_form"):
         st.subheader("📝 Request a Customized Quote")
         full_name = st.text_input("Full Name")
@@ -99,7 +99,7 @@ if matches:
         if st.form_submit_button("Send to Planning Team"):
             if full_name and email:
                 try:
-                    # New lead data
+                    # Create the lead row
                     new_lead = pd.DataFrame([{
                         "Name": full_name,
                         "Email": email,
@@ -110,13 +110,15 @@ if matches:
                         "Notes": notes
                     }])
                     
-                    # Read current sheet, append and update
-                    existing_data = conn.read()
+                    # Read current sheet with ttl=0 to avoid cache issues
+                    existing_data = conn.read(ttl=0)
+                    
+                    # Combine and Update
                     updated_df = pd.concat([existing_data, new_lead], ignore_index=True)
                     conn.update(data=updated_df)
                     
                     st.balloons()
-                    st.success("Your request has been sent! Check your Google Sheet for the new row.")
+                    st.success("Your request has been sent! Stacy and the team will be in touch.")
                 except Exception as e:
                     st.error(f"Error submitting to Google Sheets: {e}")
             else:
