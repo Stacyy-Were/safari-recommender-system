@@ -15,7 +15,7 @@ with the most iconic landscapes in the world.
 st.info("💡 **How it works:** Select your vibe and group size. We will assign the fleet and show you destinations.")
 st.markdown("---")
 
-# 3. THE KNOWLEDGE BASE (20 Destinations)
+# 3. THE KNOWLEDGE BASE
 safari_data = [
     {"name": "Masai Mara", "location": "Kenya", "mood": "Adventurous", "weather": "Sunny & Dusty", "animals": "Lions, Wildebeest, Cheetahs", "best_time": "July - Oct"},
     {"name": "Serengeti", "location": "Tanzania", "mood": "Adventurous", "weather": "Hot & Vast", "animals": "Lions, Leopards, Hyenas", "best_time": "June - Sept"},
@@ -100,23 +100,33 @@ if matches:
                 Notes: {notes}
                 """
                 
-                # Send to FormSubmit via POST request
+                # Send to FormSubmit via POST request with Headers and JSON
                 try:
+                    # UPDATED LOGIC TO FIX "SUCCESS: FALSE"
+                    headers = {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                    payload = {
+                        "_subject": f"🦁 New Safari Inquiry: {full_name}",
+                        "message": email_body,
+                        "_replyto": user_email
+                    }
+                    
                     response = requests.post(
                         f"https://formsubmit.co/ajax/{MY_EMAIL}",
-                        data={
-                            "_subject": f"🦁 New Safari Inquiry: {full_name}",
-                            "message": email_body,
-                            "_replyto": user_email
-                        }
+                        json=payload,
+                        headers=headers
                     )
+                    
                     if response.status_code == 200:
                         st.balloons()
                         st.success("Dankie! Inquiry sent.")
-                        # Server response
+                        st.write("🔥 **Important:** Check your email (stacywere1234@gmail.com) and click 'ACTIVATE FORM' to start receiving these leads!")
+                        # Debugging
                         st.write(f"Server Response: {response.json()}")
                     else:
-                        st.error("Submission failed. Please try again.")
+                        st.error(f"Error {response.status_code}: {response.text}")
                 except Exception as e:
                     st.error(f"Connection Error: {e}")
             else:
